@@ -214,7 +214,94 @@ with tabs[2]:
     st.subheader("🧩 Content Format Trends (Instagram + Twitter)")
     content_type_trend['month'] = content_type_trend['month'].astype(str)
     pivot = content_type_trend.pivot_table(index="month", columns="content_type", values="count", aggfunc="sum").fillna(0)
-    st.area_chart(pivot) 
+    st.area_chart(pivot)
+
+    #datas
+    # import pandas as pd
+
+    df_avg_engagement = pd.DataFrame({
+        'content_type': ['country', 'gaming', 'other'],
+        'Avg Likes (Instagram)': [7232530.46, 523905.00, 4569579.24]
+    })
+
+    df_twitter = pd.DataFrame({
+        'content_type': ['music', 'country', 'other', 'gaming', 'viral', 'meme', 'reaction', 'livestream'],
+        'Avg Likes (Twitter)': [117966, 298171.1, 109240.7, 66626.6, 83028, 174657.3, 82199.2, 75494],
+        'Avg Views (Twitter)': [5764902, 22166600, 12115399.74, 10780360, 4558568.33, 14281100, 5716589, 1986135],
+        'Like/View % (Twitter)': [2.05, 1.34, 0.90, 0.62, 1.82, 1.22, 1.44, 3.80]
+    })
+
+    df_youtube_top = pd.DataFrame({
+        'content_type': ['music', 'other', 'country', 'gaming', 'meme', 'viral', 'reaction'],
+        'Title': [
+            'IShowSpeed - Shake (Official Music Video)',
+            'I Played Football with Ronaldo Jr.',
+            'i met ronaldo 🇵🇹',
+            'speed vs adin 1v1 basketball',
+            'i just found out i’m a famous meme on tiktok..💔 “JUST GIVE IT TO ME”',
+            'this is crazy💔',
+            'HOW I LOST MY V CARD STORYTIME👀 (VIDEO INCLUDED)'
+        ],
+        'Views': [227676271, 26053284, 23980932, 5988569, 587585, 304584, 124634]
+    })
+
+    df_content_counts_instagram = pd.DataFrame({
+        'content_type': ['other', 'country', 'gaming'],
+        'count': [31, 13, 1]
+    })
+
+    df_cross_platform = pd.DataFrame({
+        'content_type': ['music', 'country', 'other', 'gaming', 'viral', 'meme', 'reaction', 'livestream'],
+        'Avg Likes (Twitter)': [117966, 298171.1, 109240.7, 66626.6, 83028, 174657.3, 82199.2, 75494],
+        'Avg Views (Twitter)': [5764902, 22166600, 12115399.74, 10780360, 4558568.33, 14281100, 5716589, 1986135],
+        'Like/View % (Twitter)': [2.05, 1.34, 0.90, 0.62, 1.82, 1.22, 1.44, 3.80],
+        'Avg Views (YouTube)': [22835601.69, 7961375.67, 589360.28, 504694.07, 188726.67, 95912.64, 44096.8, 0],
+        'Avg Likes (Instagram)': [0, 7232530.46, 4569579.24, 523905, 0, 0, 0, 0]
+    })
+
+    #Engagement by Content Type
+    fig = px.bar(df_avg_engagement, x='content_type', y='Avg Likes (Instagram)', title='Instagram: Avg Likes by Content Type')
+    st.plotly_chart(fig)
+
+    fig2 = px.scatter(df_twitter, x='Avg Views (Twitter)', y='Avg Likes (Twitter)', size='Like/View % (Twitter)',
+                    color='content_type', title='Twitter: Engagement Efficiency (Likes vs Views)')
+    st.plotly_chart(fig2)
+
+
+    #Top Performing Content
+    st.subheader("Top YouTube Videos by Views")
+    st.dataframe(df_youtube_top.sort_values(by='Views', ascending=False).head(5))
+
+    #Content Frequency & Dominance
+    fig = px.pie(df_content_counts_instagram, names='content_type', values='count', title='Instagram Content Distribution')
+    st.plotly_chart(fig)
+
+    #Engagement Efficiency Overview
+    st.subheader("Cross-Platform Content Efficiency")
+    st.dataframe(df_cross_platform.style.background_gradient(axis=0, cmap="Blues"))
+
+
+
+ 
+
+    st.markdown("""
+    ### 📌 Strategic Insights:
+    - **Country** content dominates Instagram & YouTube in engagement.
+    - **Music** drives scale — especially on YouTube (~22M avg views).
+    - **Livestream** content shows high Like/View % — leverage for real-time interaction.
+    - **Other**, **meme**, and **reaction** provide variety but vary by platform.
+    """)
+
+    st.markdown("""
+    ### ✅ Final Takeaways:
+    - Double down on **Country**-themed content — consistently top-performing across all platforms.
+    - Use **Music** for reach; it’s the best-performing format on YouTube.
+    - Twitter: Use **memes & livestreams** to trigger viral reactions.
+    - Instagram: Prioritize **visually rich country & lifestyle content**.
+    - YouTube: Focus on **music, country, and reaction formats** with strong thumbnails.
+    """)
+
+
 
 
 # === Tab 3: Future Predictions ===
