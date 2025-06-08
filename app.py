@@ -89,6 +89,19 @@ with tabs[1]:
     df['% Neutral'] = df['Neutral'] / df['Total'] * 100
     df['% Negative'] = df['Negative'] / df['Total'] * 100
 
+    st.header("Cross-Platform Sentiment Comparison")
+
+    comparison_data = {
+        'Platform': ['Instagram', 'Twitter', 'Reddit', 'YouTube'],
+        '% Positive': [46.4, 39.4, 18.1, 40.4],
+        '% Neutral': [48.3, 37.3, 65.1, 43.1],
+        '% Negative': [5.3, 23.4, 16.8, 16.5],
+        'Total Comments': [924, 1006, 375, 8111]
+    }
+
+    df_compare = pd.DataFrame(comparison_data)
+    st.dataframe(df_compare.style.background_gradient(cmap='RdYlGn_r', subset=['% Positive', '% Neutral', '% Negative']))
+
     # Create percentage-based bar chart
     fig = go.Figure()
 
@@ -140,48 +153,51 @@ with tabs[1]:
                     color_continuous_scale="Bluered")
         st.plotly_chart(fig, use_container_width=True)
 
-    st.header("Top Sentiment Dates")
-
-    # Summary table
-
     # Load each CSV
     df_insta = pd.read_csv('instagram_sentiment_over_time.csv')
     df_twitter = pd.read_csv('twitter_sentiment_over_time.csv')
     df_reddit = pd.read_csv('reddit_sentiment_over_time.csv')
     df_youtube = pd.read_csv('youtube_sentiment_over_time.csv')
 
-    # Combine into one DataFrame
+    # Combine
     df_all = pd.concat([df_insta, df_twitter, df_reddit, df_youtube], ignore_index=True)
 
-    # Ensure date is parsed correctly
+    # Standardize platform names
+    df_all['platform'] = df_all['platform'].str.strip().str.lower().map({
+        'youtube': 'YouTube',
+        'twitter': 'Twitter',
+        'instagram': 'Instagram',
+        'reddit': 'Reddit'
+    })
+
+    # Convert date
     df_all['date'] = pd.to_datetime(df_all['date'])
 
-    # Melt the DataFrame to long format
-    df_long = df_all.melt(id_vars=['date', 'platform'],
-                        value_vars=['positive', 'negative'],
-                        var_name='sentiment_type',
-                        value_name='count')
+    # Melt to long format
+    df_long = df_all.melt(
+        id_vars=['date'],
+        value_vars=['positive', 'negative'],
+        var_name='sentiment_type',
+        value_name='count'
+    )
+
+    # Group by date and sentiment to sum across platforms
+    df_grouped = df_long.groupby(['date', 'sentiment_type'], as_index=False).sum()
 
     # Plot
-    st.header("📊 Sentiment Trends Across Platforms")
+    fig = px.line(
+        df_grouped,
+        x='date',
+        y='count',
+        color='sentiment_type',
+        line_dash='sentiment_type',  # Optional: makes it clearer
+        title='Total Positive & Negative Sentiment Over Time (All Platforms)',
+        labels={'count': 'Mentions', 'sentiment_type': 'Sentiment'},
+        color_discrete_map={'positive': 'green', 'negative': 'red'}
+    )
 
-    fig = px.line(df_long, x='date', y='count', color='platform', line_dash='sentiment_type',
-                title='Positive & Negative Sentiment Over Time',
-                labels={'count': 'Mentions', 'sentiment_type': 'Sentiment'})
     st.plotly_chart(fig, use_container_width=True)
 
-    st.header("Cross-Platform Sentiment Comparison")
-
-    comparison_data = {
-        'Platform': ['Instagram', 'Twitter', 'Reddit', 'YouTube'],
-        '% Positive': [46.4, 39.4, 18.1, 40.4],
-        '% Neutral': [48.3, 37.3, 65.1, 43.1],
-        '% Negative': [5.3, 23.4, 16.8, 16.5],
-        'Total Comments': [924, 1006, 375, 8111]
-    }
-
-    df_compare = pd.DataFrame(comparison_data)
-    st.dataframe(df_compare.style.background_gradient(cmap='RdYlGn_r', subset=['% Positive', '% Neutral', '% Negative']))
 
     st.header("Interpretive Insight")
 
