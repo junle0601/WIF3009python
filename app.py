@@ -1,6 +1,8 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
+import plotly.graph_objects as go
+import plotly.express as px
 
 st.set_page_config(layout="wide")
 st.title("📊 IShowSpeed: Rise of a Digital Phenomenon")
@@ -88,6 +90,154 @@ with tabs[3]:
         st.subheader("👥 Subscriber Forecast")
         sub_forecast['Date'] = pd.to_datetime(sub_forecast['Date'])
         st.line_chart(sub_forecast.set_index("Date")["Predicted Subscribers"])
+
+# === Tab 3: Sentiment ===
+with tabs[2]:
+    st.title("📊 Sentiment Analysis from Instagram, Twitter, Reddit & YouTube")
+    st.subheader("📶Sentiment Distribution by Platform")
+
+    # Sentiment data
+    data = {
+        'Platform': ['Instagram', 'Twitter', 'Reddit', 'YouTube'],
+        'Positive': [429, 396, 68, 3274],
+        'Neutral': [446, 375, 244, 3495],
+        'Negative': [49, 235, 63, 1342]
+    }
+
+    # Convert to DataFrame
+    df = pd.DataFrame(data)
+
+    # Calculate total and percentage
+    df['Total'] = df[['Positive', 'Neutral', 'Negative']].sum(axis=1)
+    df['% Positive'] = df['Positive'] / df['Total'] * 100
+    df['% Neutral'] = df['Neutral'] / df['Total'] * 100
+    df['% Negative'] = df['Negative'] / df['Total'] * 100
+
+    # Create percentage-based bar chart
+    fig = go.Figure()
+
+    fig.add_trace(go.Bar(
+        x=df['Platform'],
+        y=df['% Positive'],
+        name='Positive',
+        marker_color='green'
+    ))
+    fig.add_trace(go.Bar(
+        x=df['Platform'],
+        y=df['% Neutral'],
+        name='Neutral',
+        marker_color='gray'
+    ))
+    fig.add_trace(go.Bar(
+        x=df['Platform'],
+        y=df['% Negative'],
+        name='Negative',
+        marker_color='red'
+    ))
+
+    # Layout
+    fig.update_layout(
+        barmode='group',
+        title='Percentage of Sentiment Mentions Across Platforms',
+        xaxis_title='Platform',
+        yaxis_title='Percentage (%)',
+        yaxis=dict(range=[0, 100]),
+        legend_title='Sentiment',
+        height=500
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
+
+    emoji_data = {
+    '🔥Instagram': [('🔥', 305), ('😂', 266), ('❤', 196), ('😍', 64), ('👏', 61)],
+    '😭Twitter': [('😭', 185), ('😂', 83), ('📰', 82), ('🔥', 76), ('🔴', 70)],
+    '😭Reddit': [('😭', 19), ('💀', 8), ('💪', 3), ('🔥', 3), ('🙏', 3)],
+    '😂YouTube': [('😂', 991), ('🔥', 624), ('❤', 369), ('😭', 353), ('🤣', 307)]
+    }
+
+    st.header("Top Emojis per Platform")
+
+    for platform, emoji_list in emoji_data.items():
+        st.subheader(f"{platform}")
+        df_emoji = pd.DataFrame(emoji_list, columns=["Emoji", "Count"])
+        fig = px.bar(df_emoji, x="Emoji", y="Count", title=f"Emoji Usage", color="Count",
+                    color_continuous_scale="Bluered")
+        st.plotly_chart(fig, use_container_width=True)
+
+    st.header("Top Sentiment Dates")
+
+    # Summary table
+
+    # Load each CSV
+    df_insta = pd.read_csv('instagram_sentiment_over_time.csv')
+    df_twitter = pd.read_csv('twitter_sentiment_over_time.csv')
+    df_reddit = pd.read_csv('reddit_sentiment_over_time.csv')
+    df_youtube = pd.read_csv('youtube_sentiment_over_time.csv')
+
+    # Combine into one DataFrame
+    df_all = pd.concat([df_insta, df_twitter, df_reddit, df_youtube], ignore_index=True)
+
+    # Ensure date is parsed correctly
+    df_all['date'] = pd.to_datetime(df_all['date'])
+
+    # Melt the DataFrame to long format
+    df_long = df_all.melt(id_vars=['date', 'platform'],
+                        value_vars=['positive', 'negative'],
+                        var_name='sentiment_type',
+                        value_name='count')
+
+    # Plot
+    st.header("📊 Sentiment Trends Across Platforms")
+
+    fig = px.line(df_long, x='date', y='count', color='platform', line_dash='sentiment_type',
+                title='Positive & Negative Sentiment Over Time',
+                labels={'count': 'Mentions', 'sentiment_type': 'Sentiment'})
+    st.plotly_chart(fig, use_container_width=True)
+
+    st.header("Cross-Platform Sentiment Comparison")
+
+    comparison_data = {
+        'Platform': ['Instagram', 'Twitter', 'Reddit', 'YouTube'],
+        '% Positive': [46.4, 39.4, 18.1, 40.4],
+        '% Neutral': [48.3, 37.3, 65.1, 43.1],
+        '% Negative': [5.3, 23.4, 16.8, 16.5],
+        'Total Comments': [924, 1006, 375, 8111]
+    }
+
+    df_compare = pd.DataFrame(comparison_data)
+    st.dataframe(df_compare.style.background_gradient(cmap='RdYlGn_r', subset=['% Positive', '% Neutral', '% Negative']))
+
+    st.header("Interpretive Insight")
+
+    st.markdown("""
+    - 🔥 **Instagram & YouTube** show consistently positive sentiment and are emoji-rich.
+    - 💬 **Twitter** shows the highest emotional reactivity — both positive and negative — likely due to real-time events.
+    - 💭 **Reddit** has a high neutral percentage, suggesting deeper or more analytical discussions.
+    - 📅 **May 30–31** marks a major sentiment spike across platforms — aligned with the UCL trophy moment.
+    """)
+
+    st.header("Summary & Implications")
+
+    st.markdown("""
+    ### Key Takeaways:
+    - **Instagram and YouTube** audiences are most supportive of IShowSpeed.
+    - **Twitter**'s spikes reveal its strength as a reaction platform for live content.
+    - **Reddit** offers a more analytical, discussion-based sentiment environment.
+    - **Major spikes** in late May are tied to IShowSpeed's **Champions League moment**.
+
+    ### Implications:
+    - Brands or collaborators should focus campaigns on Instagram/YouTube for high sentiment.
+    - Twitter is ideal for viral reactions and controversy monitoring.
+    - Reddit can be used to test long-form engagement and deep feedback.
+    """)
+
+
+# === Tab 4: Content Types ===
+with tabs[3]:
+    st.subheader("🧩 Content Format Trends (Instagram + Twitter)")
+    content_trend['month'] = content_trend['month'].astype(str)
+    pivot = content_trend.pivot_table(index="month", columns="content_type", values="count", aggfunc="sum").fillna(0)
+    st.area_chart(pivot)
 
 # === Tab 5: Country Mentions ===
 with tabs[4]:
