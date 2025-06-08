@@ -20,27 +20,61 @@ except Exception as e:
 
 # === Tabs ===
 tabs = st.tabs([
-    "📌 Overview", "📈 YouTube Forecast", "📊 Sentiment Trends", "📺 Content Types",
-    "🌍 Country Mentions", "🤝 Collaborations", "🤖 Comparisons", "🔮 Conclusions"
+    "📌 Overview", "📊 Sentiment Trends", "📺 Content Types",  "📈 YouTube Forecast", "🌍 Country Mentions", "🤝 Collaborations", "🤖 Comparisons", "🔮 Conclusions"
 ])
 
 # === Tab 1: Overview ===
 with tabs[0]:
-    st.header("Project Summary & Introduction")
+    st.header("🔍 Introduction to IShowSpeed")
+    col1, col2 = st.columns([1, 3])  # adjust width ratio as you like
+
+    with col1:
+        st.image("ishowspeed_picture.jpg", caption="IShowSpeed", use_column_width=True)
+
+    with col2:
+        st.markdown("""
+        **IShowSpeed** (real name: Darren Watkins Jr.) is a high-energy digital entertainer who rose to global fame through his unpredictable livestreams and viral moments. Known for his explosive reactions, chaotic humor, and intense audience interaction, he quickly became one of the most recognizable figures in the online entertainment space.
+
+        His journey began on YouTube, where his gaming videos and live chats began attracting a steady stream of viewers. Over time, his reach expanded significantly to platforms like Twitter (X), Instagram, and Reddit — where fan discussions, memes, and clips of his antics further amplified his popularity. Unlike traditional creators, IShowSpeed thrives on spontaneity, often blurring the line between content and performance.
+
+        What sets him apart is not just the content he produces, but how he engages with his audience in real-time. His streams often feature dramatic, meme-worthy moments that get instantly circulated, helping him sustain viral traction. Combined with his youthful energy and unpredictable antics, IShowSpeed has built a dedicated community that spans across multiple platforms and demographics.
+
+        This dashboard offers an analytical deep-dive into his digital footprint — exploring his growth trajectory, public perception, content patterns, and what the future might hold for one of the most talked-about internet personalities today.
+        """)
     st.markdown("""
-    **IShowSpeed** is a viral digital entertainer known for his chaotic humor and explosive reactions.  
-    This dashboard analyzes his rise through data and forecasts what's next.
-    """)
-    st.markdown("""
-    **Key Features**:
-    - Social media growth analysis (YouTube, Twitter, IG)
-    - Audience sentiment breakdown
-    - Top countries and collaborators
-    - Predictive analytics for views, subscribers, and global expansion
+    ### 🚀 Dashboard Key Features
+    - **Sentiment Analysis:** Gauge and compare public sentiments over time using comments and discussions gathered from various social media platforms.
+    - **Content Analysis:** Explore what types of content generate the most interaction and engagement across different platforms.
+    - **Predictive Analytics:** Forecast potential future growth, platform expansion, creation of new video formats, possible collaborations, and future country visits.
+    - **Comparative Insights:** See how IShowSpeed’s growth compares to creators like MrBeast and Doja Cat, and what sets him apart from them.
     """)
 
-# === Tab 2: Forecast ===
+    st.markdown("""
+    ### 📥 Data Sources Overview
+                
+    - **YouTube**: Titles, view counts, publish dates, and top user comments for all videos, along with growth metrics like subscriber and view trends over time.  
+    - **Twitter (X)**: Full tweet history from IShowSpeed’s account, including engagement metrics (**likes**, **retweets**, **views**), and public tweets mentioning him to support sentiment analysis. 
+    - **Instagram**: Titles, likes and comments from posts on IShowSpeed’s official account, enabling content performance and audience interaction studies.  
+    - **Reddit**: Discussions mentioning IShowSpeed to understand how he's talked about in online communities and forums.  
+    - **Audience Demographics**: Geographical distribution of IShowSpeed’s **Twitter** followers to map out his global reach.
+    """)
+
+# === Tab 2: Sentiment Trends ===
 with tabs[1]:
+    st.subheader("📊 Sentiment Over Time")
+    st.line_chart(sentiment_over_time.set_index("Date")[["positive", "negative"]])
+    st.markdown("Majority of audience sentiment remains positive, especially after viral streams or collaborations.")
+    
+
+# === Tab 3: Content Types ===
+with tabs[2]:
+    st.subheader("🧩 Content Format Trends (Instagram + Twitter)")
+    content_trend['month'] = content_trend['month'].astype(str)
+    pivot = content_trend.pivot_table(index="month", columns="content_type", values="count", aggfunc="sum").fillna(0)
+    st.area_chart(pivot) 
+
+# === Tab 4: Youtube Forecast ===
+with tabs[3]:
     col1, col2 = st.columns(2)
     with col1:
         st.subheader("📈 Monthly Views Forecast")
@@ -54,19 +88,6 @@ with tabs[1]:
         st.subheader("👥 Subscriber Forecast")
         sub_forecast['Date'] = pd.to_datetime(sub_forecast['Date'])
         st.line_chart(sub_forecast.set_index("Date")["Predicted Subscribers"])
-
-# === Tab 3: Sentiment ===
-with tabs[2]:
-    st.subheader("📊 Sentiment Over Time")
-    st.line_chart(sentiment_over_time.set_index("Date")[["positive", "negative"]])
-    st.markdown("Majority of audience sentiment remains positive, especially after viral streams or collaborations.")
-
-# === Tab 4: Content Types ===
-with tabs[3]:
-    st.subheader("🧩 Content Format Trends (Instagram + Twitter)")
-    content_trend['month'] = content_trend['month'].astype(str)
-    pivot = content_trend.pivot_table(index="month", columns="content_type", values="count", aggfunc="sum").fillna(0)
-    st.area_chart(pivot)
 
 # === Tab 5: Country Mentions ===
 with tabs[4]:
