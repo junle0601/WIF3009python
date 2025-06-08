@@ -67,8 +67,7 @@ with tabs[0]:
     - **Audience Demographics**: Geographical distribution of IShowSpeed’s **Twitter** followers to map out his global reach.
     """)
 
-# === Tab 2: Sentiment Trends ===
-# === Tab 2: Sentiment Analysis ===
+# === Tab 1: Sentiment Analysis ===
 with tabs[1]:
     st.title("📊 Sentiment Analysis from Instagram, Twitter, Reddit & YouTube")
     st.subheader("📶Sentiment Distribution by Platform")
@@ -210,35 +209,13 @@ with tabs[1]:
 
 
 
-# === Tab 3: Content Types ===
+# === Tab 2: Content Types ===
 with tabs[2]:
-    st.subheader("🧩 Content Format Trends (Instagram + Twitter)")
-    content_trend['month'] = content_trend['month'].astype(str)
-    pivot = content_trend.pivot_table(index="month", columns="content_type", values="count", aggfunc="sum").fillna(0)
-    st.area_chart(pivot) 
-
-# === Tab 4: Youtube Forecast ===
-with tabs[3]:
-    col1, col2 = st.columns(2)
-    with col1:
-        st.subheader("📈 Monthly Views Forecast")
-        yt_views['Month'] = pd.to_datetime(yt_views['Month'], errors='coerce', format='mixed')
-        fig, ax = plt.subplots()
-        ax.plot(yt_views['Month'], yt_views['Predicted Views'], marker='o')
-        ax.set_title("Monthly Views Forecast")
-        ax.grid()
-        st.pyplot(fig)
-    with col2:
-        st.subheader("👥 Subscriber Forecast")
-        sub_forecast['Date'] = pd.to_datetime(sub_forecast['Date'])
-        st.line_chart(sub_forecast.set_index("Date")["Predicted Subscribers"])
-
-# === Tab 4: Content Types ===
-with tabs[3]:
     st.subheader("🧩 Content Format Trends (Instagram + Twitter)")
     content_type_trend['month'] = content_type_trend['month'].astype(str)
     pivot = content_type_trend.pivot_table(index="month", columns="content_type", values="count", aggfunc="sum").fillna(0)
-    st.area_chart(pivot)
+    st.area_chart(pivot) 
+
 
 # === Tab 3: Future Predictions ===
 with tabs[3]:
