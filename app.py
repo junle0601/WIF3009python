@@ -63,36 +63,6 @@ with tabs[0]:
 
 # === Tab 2: Sentiment Trends ===
 with tabs[1]:
-    st.subheader("📊 Sentiment Over Time")
-    st.line_chart(sentiment_over_time.set_index("Date")[["positive", "negative"]])
-    st.markdown("Majority of audience sentiment remains positive, especially after viral streams or collaborations.")
-    
-
-# === Tab 3: Content Types ===
-with tabs[2]:
-    st.subheader("🧩 Content Format Trends (Instagram + Twitter)")
-    content_trend['month'] = content_trend['month'].astype(str)
-    pivot = content_trend.pivot_table(index="month", columns="content_type", values="count", aggfunc="sum").fillna(0)
-    st.area_chart(pivot) 
-
-# === Tab 4: Youtube Forecast ===
-with tabs[3]:
-    col1, col2 = st.columns(2)
-    with col1:
-        st.subheader("📈 Monthly Views Forecast")
-        yt_views['Month'] = pd.to_datetime(yt_views['Month'], errors='coerce', format='mixed')
-        fig, ax = plt.subplots()
-        ax.plot(yt_views['Month'], yt_views['Predicted Views'], marker='o')
-        ax.set_title("Monthly Views Forecast")
-        ax.grid()
-        st.pyplot(fig)
-    with col2:
-        st.subheader("👥 Subscriber Forecast")
-        sub_forecast['Date'] = pd.to_datetime(sub_forecast['Date'])
-        st.line_chart(sub_forecast.set_index("Date")["Predicted Subscribers"])
-
-# === Tab 3: Sentiment ===
-with tabs[2]:
     st.title("📊 Sentiment Analysis from Instagram, Twitter, Reddit & YouTube")
     st.subheader("📶Sentiment Distribution by Platform")
 
@@ -231,6 +201,30 @@ with tabs[2]:
     - Reddit can be used to test long-form engagement and deep feedback.
     """)
 
+
+
+# === Tab 3: Content Types ===
+with tabs[2]:
+    st.subheader("🧩 Content Format Trends (Instagram + Twitter)")
+    content_trend['month'] = content_trend['month'].astype(str)
+    pivot = content_trend.pivot_table(index="month", columns="content_type", values="count", aggfunc="sum").fillna(0)
+    st.area_chart(pivot) 
+
+# === Tab 4: Youtube Forecast ===
+with tabs[3]:
+    col1, col2 = st.columns(2)
+    with col1:
+        st.subheader("📈 Monthly Views Forecast")
+        yt_views['Month'] = pd.to_datetime(yt_views['Month'], errors='coerce', format='mixed')
+        fig, ax = plt.subplots()
+        ax.plot(yt_views['Month'], yt_views['Predicted Views'], marker='o')
+        ax.set_title("Monthly Views Forecast")
+        ax.grid()
+        st.pyplot(fig)
+    with col2:
+        st.subheader("👥 Subscriber Forecast")
+        sub_forecast['Date'] = pd.to_datetime(sub_forecast['Date'])
+        st.line_chart(sub_forecast.set_index("Date")["Predicted Subscribers"])
 
 # === Tab 4: Content Types ===
 with tabs[3]:
